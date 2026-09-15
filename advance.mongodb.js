@@ -445,6 +445,7 @@ db.orders.aggregate([
 
 ])
 
+// calculate the average of the Orders
 
 db.orders.aggregate([ 
   {
@@ -457,4 +458,26 @@ db.orders.aggregate([
   }
  ])
 
+
+ //Find the Most Common Payment Method
+
+db.orders.aggregate([
+  {
+    $group : {
+      _id : '$payment.method',
+      paymentMethod : { $sum : 1 },
+    }
+  },
+  {
+    $sort : {
+      totalQuantity : -1
+    }
+  },
+  {
+    $limit : 1 ,
+  }
+])
+
+
+//
 
