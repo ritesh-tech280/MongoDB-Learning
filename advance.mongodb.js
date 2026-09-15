@@ -398,10 +398,9 @@ use("ecommerce");
 //   },
 // ]);
 
-
-// Calculate the revenue by Category 
+// Calculate the revenue by Category
 // db.orders.aggregate([
-//   { 
+//   {
 //     $unwind : '$items'
 //   },
 //   {
@@ -412,7 +411,7 @@ use("ecommerce");
 //       as: 'product'
 //     }
 //   } ,
-//   { 
+//   {
 //     $unwind : '$product',
 //   } ,
 //   {
@@ -428,56 +427,87 @@ use("ecommerce");
 
 // Give the user who spend more than 10000
 
-db.orders.aggregate([ 
-  { 
-    $group : {
-      _id : '$userId',
-      totalAmount : { $sum : '$totalAmount' }
-    }
-  } ,
+db.orders.aggregate([
+  {
+    $group: {
+      _id: "$userId",
+      totalAmount: { $sum: "$totalAmount" },
+    },
+  },
   {
     $match: {
-       totalAmount : {
-        $gt : 100000
-       }
-    }
-  }
-
-])
+      totalAmount: {
+        $gt: 100000,
+      },
+    },
+  },
+]);
 
 // calculate the average of the Orders
 
-db.orders.aggregate([ 
+db.orders.aggregate([
   {
-    $group : {
-      _id : null,
-      averageOrderValue : { 
-        $avg :  '$totalAmount'
-      }
-    }
-  }
- ])
+    $group: {
+      _id: null,
+      averageOrderValue: {
+        $avg: "$totalAmount",
+      },
+    },
+  },
+]);
 
-
- //Find the Most Common Payment Method
+//Find the Most Common Payment Method
 
 db.orders.aggregate([
   {
-    $group : {
-      _id : '$payment.method',
-      paymentMethod : { $sum : 1 },
-    }
+    $group: {
+      _id: "$payment.method",
+      paymentMethod: { $sum: 1 },
+    },
   },
   {
-    $sort : {
-      totalQuantity : -1
-    }
+    $sort: {
+      totalQuantity: -1,
+    },
   },
   {
-    $limit : 1 ,
+    $limit: 1,
+  },
+]);
+
+// find the user wchich spent most money
+
+db.orders.aggregate([
+  {
+    $group: {
+      _id: "$userId",
+      TotalSpent: { $sum: "$totalAmount" },
+    },
+  },
+  {
+    $lookup: {
+      from: "users",
+      localField: "_id",
+      foreignField: "_id",
+      as: "user",
+    },
+  },
+  {
+    $unwind: "$user",
+  },
+  {
+    $sort: {
+      TotalSpent: -1,
+    },
+  },
+  {
+    $limit: 1,
+  },
+  {
+    $project: {
+      _id : 0 ,
+      name : '$user.name',
+      TotalSpent : 1
+    }
   }
-])
-
-
-//
-
+]);
