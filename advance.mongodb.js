@@ -511,3 +511,44 @@ db.orders.aggregate([
     }
   }
 ]);
+
+
+/// find top 3 products by Category 
+
+db.orders.aggregate([
+  {
+    $unwind : '$items'
+  },
+  {
+    $group: {
+      _id: '$items.productId',
+      ProductRevenue: {$sum : { $multiply : ['$items.quantity' , '$items.price' ] }},
+    }
+  },
+  {
+     $lookup: {
+       from:  'products',
+       localField: '_id',
+       foreignField: '_id',
+       as: 'product'
+     }
+  },
+  {
+    $unwind : '$product'
+  },
+  { 
+    $sort : {
+       ProductRevenue : -1
+    },
+  }, 
+  {
+    $limit: 3,
+  } ,
+  {
+    $project: {
+      _id : 0 ,
+      name : '$product.name',
+      ProductRevenue : 1,
+    }
+  }
+])
