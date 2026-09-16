@@ -1,0 +1,1 @@
+MongoDB Learning Repository — A structured collection of MongoDB concepts, queries, aggregation pipelines, database design, CRUD operations, and practical exercises for mastering MongoDB from fundamentals to advanced concepts.
